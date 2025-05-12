@@ -4,7 +4,7 @@ import asyncio
 import json
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from config import API_ID, API_HASH, BOT_TOKEN, OWNER_ID
+from config import OWNER_ID
 
 # Constants
 SCRIPT_PATH = "./animepahe-dl.sh"
