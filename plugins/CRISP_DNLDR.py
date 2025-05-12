@@ -20,7 +20,6 @@ class AnimeDL:
             os.chmod(SCRIPT_PATH, 0o755)
         
     async def execute_cmd(self, cmd: list) -> tuple:
-    """Execute shell command and return output"""
     try:
         # Add environment variables
         env = os.environ.copy()
