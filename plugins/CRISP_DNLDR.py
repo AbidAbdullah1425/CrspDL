@@ -88,14 +88,6 @@ class AnimeDL:
 
 dl = AnimeDL()
 
-@Bot.on_message(filters.command("start"))
-async def start_cmd(client, message: Message):
-    await message.reply_text(
-        "🎯 Welcome to AnimePahe Downloader Bot!\n\n"
-        "Use /dl <anime name> to search and download anime\n"
-        "Example: `/dl jujutsu kaisen`"
-    )
-
 @Bot.on_message(filters.command("dl") & filters.user(OWNER_ID))
 async def handle_dl_cmd(client, message: Message):
     if len(message.command) < 2:
