@@ -16,7 +16,11 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy all files including the script
 COPY . .
-RUN chmod +x animepahe-dl.sh
+RUN chmod +x /app/animepahe-dl.sh
+
+# Test script execution
+RUN /app/animepahe-dl.sh -a "test" || true
 
 CMD ["python3", "main.py"]
