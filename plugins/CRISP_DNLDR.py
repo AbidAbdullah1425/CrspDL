@@ -6,25 +6,33 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from config import OWNER_ID
 
-# Constants
-SCRIPT_PATH = "./animepahe-dl.sh"
-DOWNLOADS_PATH = "./downloads"
+# Constants - Use /tmp for temporary storage as it's usually writable
+SCRIPT_PATH = "/app/animepahe-dl.sh"  # Script in the app directory
+DOWNLOADS_PATH = "/tmp/downloads"  # Use /tmp for downloads
 TEMP_DATA = {}  # Store user selection data temporarily
 
 class AnimeDL:
     def __init__(self):
         self.active_downloads = {}
         os.makedirs(DOWNLOADS_PATH, exist_ok=True)
+        # Make script executable if needed
+        if os.path.exists(SCRIPT_PATH):
+            os.chmod(SCRIPT_PATH, 0o755)
         
     async def execute_cmd(self, cmd: list) -> tuple:
         """Execute shell command and return output"""
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
-        return stdout.decode(), stderr.decode(), process.returncode
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd="/tmp"  # Set working directory to /tmp
+            )
+            stdout, stderr = await process.communicate()
+            return stdout.decode(), stderr.decode(), process.returncode
+        except Exception as e:
+            return "", str(e), 1
+
 
     async def search_anime(self, query: str) -> list:
         """Search for anime using the script"""
