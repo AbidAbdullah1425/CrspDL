@@ -21,6 +21,11 @@
 #/   -d                      enable debug mode
 #/   -h | --help             display this help message
 
+# Disable interactive mode if environment variable is set
+if [[ -n "${ANIMEPAHE_DL_NONINTERACTIVE}" ]]; then
+    _FZF="cat"  # Replace fzf with simple output
+fi
+
 set -e
 set -u
 
