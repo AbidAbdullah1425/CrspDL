@@ -20,18 +20,23 @@ class AnimeDL:
             os.chmod(SCRIPT_PATH, 0o755)
         
     async def execute_cmd(self, cmd: list) -> tuple:
-        """Execute shell command and return output"""
-        try:
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd="/tmp"  # Set working directory to /tmp
-            )
-            stdout, stderr = await process.communicate()
-            return stdout.decode(), stderr.decode(), process.returncode
-        except Exception as e:
-            return "", str(e), 1
+    """Execute shell command and return output"""
+    try:
+        # Add environment variables
+        env = os.environ.copy()
+        env['ANIMEPAHE_DL_NODE'] = '/usr/bin/node'
+        
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=env,
+            cwd="/tmp"  # Set working directory to /tmp
+        )
+        stdout, stderr = await process.communicate()
+        return stdout.decode(), stderr.decode(), process.returncode
+    except Exception as e:
+        return "", str(e), 1
 
 
     async def search_anime(self, query: str) -> list:
