@@ -16,18 +16,24 @@ RUN apt-get update && apt-get install -y \
 # Create and set working directory
 WORKDIR /app
 
-# Copy script and make executable
-COPY animepahe-dl.sh .
-RUN chmod +x animepahe-dl.sh
+# Copy requirements first for better caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all bot files
 COPY . .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Set correct permissions for the script
+RUN chmod +x /app/animepahe-dl.sh \
+    && chmod 755 /app/animepahe-dl.sh \
+    && chown root:root /app/animepahe-dl.sh
+
+# Create downloads directory with proper permissions
+RUN mkdir -p /app/downloads \
+    && chmod 777 /app/downloads
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
 # Run bot
-CMD ["python3", "main.py"]
+CMD ["python3", "bot.py"]
