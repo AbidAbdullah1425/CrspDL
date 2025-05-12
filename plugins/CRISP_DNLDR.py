@@ -111,14 +111,19 @@ async def handle_dl_cmd(client, message: Message):
     status_msg = await message.reply_text("🔍 Searching anime...")
 
     try:
+        # Add specific environment variables to avoid interactive prompts
+        env = os.environ.copy()
+        env['ANIMEPAHE_DL_NODE'] = '/usr/bin/node'
+        
         # Execute search command with error checking
         cmd = ["/app/animepahe-dl.sh", "-a", query]
         process = await asyncio.create_subprocess_exec(
             *cmd,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
+            env=env,
+            cwd="/tmp"  # Set working directory to /tmp
         )
-        stdout, stderr = await process.communicate()
         
         # Debug output
         print(f"Search command: {' '.join(cmd)}")
