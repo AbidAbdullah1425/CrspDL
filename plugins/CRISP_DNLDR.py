@@ -105,25 +105,60 @@ async def handle_dl_cmd(client, message: Message):
     query = " ".join(message.command[1:])
     status_msg = await message.reply_text("🔍 Searching anime...")
 
-    results = await dl.search_anime(query)
-    if not results:
-        await status_msg.edit_text("❌ No results found!")
-        return
+    try:
+        # Execute search command with error checking
+        cmd = ["/app/animepahe-dl.sh", "-a", query]
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        
+        # Debug output
+        print(f"Search command: {' '.join(cmd)}")
+        print(f"Exit code: {process.returncode}")
+        print(f"Stdout: {stdout.decode()}")
+        print(f"Stderr: {stderr.decode()}")
 
-    # Create keyboard with results
-    buttons = []
-    for result in results[:8]:  # Limit to 8 results
-        buttons.append([
-            InlineKeyboardButton(
-                text=result["title"][:60],
-                callback_data=f"anime_{result['session']}"
-            )
-        ])
+        if process.returncode != 0:
+            await status_msg.edit_text(f"❌ Search failed: {stderr.decode()}")
+            return
 
-    await status_msg.edit_text(
-        "🎯 Select anime:",
-        reply_markup=InlineKeyboardMarkup(buttons)
-    )
+        stdout_text = stdout.decode()
+        if not stdout_text.strip():
+            await status_msg.edit_text("❌ No results found!")
+            return
+
+        # Create keyboard with results
+        buttons = []
+        for line in stdout_text.splitlines():
+            if "]" in line and line.strip():
+                try:
+                    session = line.split("]")[0].strip("[")
+                    title = line.split("]")[1].strip()
+                    buttons.append([
+                        InlineKeyboardButton(
+                            text=title[:60],
+                            callback_data=f"anime_{session}"
+                        )
+                    ])
+                except:
+                    continue
+
+        if not buttons:
+            await status_msg.edit_text("❌ No results found!")
+            return
+
+        await status_msg.edit_text(
+            "🎯 Select anime:",
+            reply_markup=InlineKeyboardMarkup(buttons[:8])
+        )
+
+    except Exception as e:
+        print(f"Error in handle_dl_cmd: {str(e)}")
+        await status_msg.edit_text(f"❌ An error occurred: {str(e)}")
+
 
 @Bot.on_callback_query(filters.regex("^anime_"))
 async def handle_anime_selection(client, callback: CallbackQuery):
