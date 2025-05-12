@@ -19,4 +19,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chmod +x animepahe-dl.sh
 
-CMD ["python3", "bot.py"]
+CMD ["python3", "main.py"]
