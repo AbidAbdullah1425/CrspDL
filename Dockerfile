@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-# Install dependencies including nodejs
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     jq \
@@ -13,18 +13,14 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy requirements first
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all files
 COPY . .
+RUN chmod +x animepahe-dl.sh
 
-# Make script executable
-RUN chmod +x animepahe-dl.sh && \
-    mkdir -p /tmp/downloads
-
-# Set environment variable for script
+# Set environment variables
 ENV ANIMEPAHE_DL_NODE=/usr/bin/node
+ENV ANIMEPAHE_DL_NONINTERACTIVE=1
 
 CMD ["python3", "main.py"]
