@@ -1,14 +1,14 @@
 
 
 
-FROM alpine:latest
+FROM python:3.10-alpine
 
-# Install bash or any needed tool
-RUN apk add --no-cache bash curl
+RUN apk add --no-cache bash
 
-# Copy script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+WORKDIR /app
+COPY . .
 
-# Run the script
-CMD ["/start.sh"]
+RUN pip install -r requirements.txt
+RUN chmod +x start.sh
+
+CMD ["python", "bot.py"]
