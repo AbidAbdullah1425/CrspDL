@@ -1,13 +1,14 @@
 
 
-FROM debian:bullseye-slim
 
-# Install any required packages
-RUN apt update && apt install -y bash curl
+FROM alpine:latest
 
-# Copy your script
+# Install bash or any needed tool
+RUN apk add --no-cache bash curl
+
+# Copy script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-# Run it when container starts
+# Run the script
 CMD ["/start.sh"]
