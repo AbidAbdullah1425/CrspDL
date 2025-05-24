@@ -28,3 +28,11 @@ async def start_command(client: Client, message: Message):
         disable_web_page_preview=True,
         quote=True
     )
+
+@Bot.on_message(filters.command("startfile"))
+async def start_script(client, message):
+    try:
+        result = subprocess.check_output(["/bin/sh", "start.sh"], stderr=subprocess.STDOUT)
+        await message.reply(f"`{result.decode()}`")
+    except subprocess.CalledProcessError as e:
+        await message.reply(f"Error:\n`{e.output.decode()}`")
